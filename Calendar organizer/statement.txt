@@ -1,0 +1,2 @@
+Given a list of schedules for two people, find the time intervals in which they could meet.
+Assume intervals are given in correct order, there are no conflicts and the intervals are between the correct schedule

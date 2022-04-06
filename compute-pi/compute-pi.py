@@ -8,8 +8,6 @@ import random
 from math import sqrt
 from typing import List
 
-t = time.time()
-
 # Method 1. Geometric Probability
 
 """
@@ -46,7 +44,7 @@ def estimate_pi(l : List):
             p += 1
     return 4*(p/len(l))
 
-t = time.time()
+t = time.perf_counter()
 
 # estimations
 e1 = estimate_pi(l1)
@@ -64,7 +62,7 @@ print(f"100000:  {e4:<{10}} error: {abs(math.pi - e4):.5f}")
 print(f"1000000: {e5:<{10}} error: {abs(math.pi - e5):.5f}")
 print(f"5000000: {e6:<{10}} error: {abs(math.pi - e6):.5f}")
 
-print("time elapsed: {:.3f}s".format(time.time() - t))
+print("time elapsed: {:.3f}s".format(time.perf_counter() - t))
 print("------------------------------------")
 # Method 2. Riemann sum
 """
@@ -103,7 +101,7 @@ def riemann(l):
         sum += (l[i+1] - l[i])*(sqrt(1 - l[i]*l[i]))
     return 4*sum
 
-t = time.time()
+t = time.perf_counter()
 
 # estimations
 e1 = riemann(l1)
@@ -122,7 +120,7 @@ print(f"100000:  {e4:.10f} error: {abs(math.pi - e4):.5f}")
 print(f"1000000: {e5:.10f} error: {abs(math.pi - e5):.5f}")
 print(f"5000000: {e6:.10f} error: {abs(math.pi - e6):.5f}")
 
-print("time elapsed: {:.3f}s".format(time.time() - t))
+print("time elapsed: {:.3f}s".format(time.perf_counter() - t))
 
 
 """

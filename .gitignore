@@ -6,5 +6,6 @@ panic-defer-recover.go
 slices.go
 test_stuff.go
 
-.exe
-.class
+*.exe
+*.class
+

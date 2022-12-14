@@ -11,7 +11,7 @@ I don't really have a language preference, most are in Go since I'm the most fam
 Here's the structure of this repository:
 
 - [`Advent of code 2022`](https://github.com/Ozoniuss/Algorithms/tree/master/advent-of-code-2022) has my solutions for the [2022 Advent of Code contest](https://adventofcode.com/2022)
-- [`interviews`] contains a list of problems I collected from coding interviews 🗓️
+- [`interviews`](https://github.com/Ozoniuss/Algorithms/tree/master/interviews) contains a list of problems I collected from coding interviews 🗓️
 - [`leetcode`](https://github.com/Ozoniuss/Algorithms/tree/master/leetcode) contains solutions of problems I solved from leetcode
 - [`math-stuff`](https://github.com/Ozoniuss/Algorithms/tree/master/math-stuff) contains more "math-y" stuff (you probably don't want to look there 😒)
 - [`speedrun`](https://github.com/Ozoniuss/Algorithms/tree/master/speedrun) contains fairly easy problems that you should solve quickly under serious pressure	⏲️

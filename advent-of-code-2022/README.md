@@ -70,4 +70,78 @@ Moving on to the simulation, at every step you move a number of crates from one 
 
 The simulation itself was not challenging, but storing state does introduce an additional layer of complexity, especially when you're trying to write clean code. This, combined with parsing the input makes this the first problem that receives from me two Christmas Trees in difficulty: 🎄🎄
 
-to be continued...
+6. [📱❎🈶](./06-tuning-trouble/): finding the right substring
+
+Back to string work. The input was actually only a long string this time. The main idea behind this problem was finding the first substring (with consecutive characters) with a given length from the long string such that all the characters in the substring are different. In part (a), that lenght was 4, and in part (b) that length was 14, probably to add some more algorithmic thinking to those who at part (a) just checked that each letter is different from the other 3 (yes, myself included 🙈).
+
+Either way, this problem was really simple, slightly similar underlying idea to problem 3 where you had to check for a common character. The most straightforward ideas would be converting the substring to a set, or checking char by char in two `for` loops. Doing that in a function while advancing with the substring one letter at a time through the main string also makes for a nice separation of concerns. Technically you could also optimize by keeping track of the characters in the previous check, but that's not really necessary.
+
+```
+dcbc(sbblhhgdgssmcm)qccdw  -->  dcbcs(bblhhgdgssmcmq)ccdw  --> ...
+```
+
+This problem was quite a bit shorter than the previous one, so it only gets one Christmas Tree in difficulty: 🎄
+
+7. [📁💾🖥️](./07-no-space-left-on-device/): cleaning the filesystem
+
+Somewhat of a simulation as well, this problem is inspired from the Linux filesystem and in my opinion is really well thought-out. Your input consists of two Linux commands: `cd` (change directory) and `ls` (list). The problem simulates navigating through the filesystem and displaying the files from various directories, including their size. In both parts, the requirement was pretty much computing the size of each directory, and identifying the one(s) that satisfies a specific constraint, in particular, having a size greater than some number at part (a), and being the smallest one with the size greater than some number at part (b).
+
+Once you know the size of all directories, answering the questions is not hard at all, but the tricky part here is to actually find the size of each directory! A stack is your best friend to keep track of the current directory. If you know your working directory, you can pretty much interpret the meaning of every line, so this problem can be solved by reading the input line by line and holding the current directory and its size. In the input it's also pretty much guaranteed that the exploration pattern is always the same.
+
+Even if the idea itself doesn't seem complicated, the execution is not trivial. One must take into account all parent directories for a directory name, since I didn't find the statement to specify whether directory names are unique, and must also keep in mind that to the size of a directory one must add the size of the child directories. With all these in mind, this "simulation" was definitely more challenging than the crane one for problem 5, giving the problem three Christmas Trees in difficulty: 🎄🎄🎄
+
+8. [🌲🏡🚁](./08-treetop-tree-house/): the tallest tree
+
+This is the first problem involving a matrix: a matrix of integers. This is also the first problem where I started benefiting from the fact that in Go, arrays are passed by value by default. Whenever I had to store positions, I went with the datatype `[2]int`, and later down the line, I started doing 
+
+```go
+type Location [2]int
+```
+
+as syntactic sugar.
+
+To break down the requirement, at part (a) you had to find all numbers in the matrix that's either greater than all numbers in front or behind it, either on its row or column. Part (b) was similar, for all numbers in the matrix you had to compute a property based on how many numbers on its row or column are greater than itself, and find the position with the highest value for that property.
+
+There likely are better optimizations, but the most intuitive approach of going in all four directions using loops does the trick for this problem. And since that and reading a matrix input is straightforward, I will give this problem one Christmas Tree in difficulty: 🎄
+
+9. [🐍🌉🧵](./09-rope-bridge/): snake
+
+On with the simulations: this problem was pretty much simulating the snake game (or at least a very similar game). For part (a), the snake had length 2 and length 10 at part (b). The statement describes how the snake "moves", and the input consisted of the snake directions. In both parts, you had to say which squares the snake visited.
+
+Using the same trick as before for positions and modelling the snake as an array of fixed length (in golang) works well here, and defining a `move(snake, direction)` function does a nice separation of concerns. Once the modelling is done, part (a) is done pretty quickly, but applying the same idea for part (b) doesn't work, because the motion can place the snake in certain positions that don't come to mind initially, where the movement is different. These were also not showcased in the example, so I did spend quite some time wondering why the approach at part (a) kept failing. I'll describe that case in more detail on the problem page, but for that reason, this problem receives three Christmas Trees in difficulty: 🎄🎄🎄
+
+10. [🕹️📺🔍](./10-cathode-ray-tube/): hardware instructions with a CRT screen
+
+The simulations keep going, now simulating cycles of a circuit and drawing pixels. At part (a), the instructions were simulating adding and subtracting values to a register at every cycle, and you had to keep track of the register's values at some specific cycle numbers. Part (a) went quickly, but part (b) was definitely a ramp up in difficulty: the cycle number was simulating a pixel position on a CRT screen, and based on the register's value (which indicated three consecutive pixel positions) you had to determine whether you were allowed to draw a pixel or not. The fact that after 40 pixels you started a new row also added to the difficulty.
+
+This was also the first and only problem that required a human interpretation of the result: at the end you had to draw the "screen", and write the letters displyed on the "screen" as the answer. It definitely was one of the longer problems, but the checks themselves were not difficult, maybe a bit annoying because you had to keep track of multiple things at once. Talking about difficulty, I would consider it on the same page with the previous one, receiving three Christmas Trees: 🎄🎄🎄
+
+11. [🐒⚾🏓](./11-monkey-in-the-middle/): _monke_ games
+
+This is where the monkeys (or _monke_-s) got in the picutre. In this new simulation problem, at each round, the monkeys have a list of numbers, and each monkey does some operations to every number. Based on the result of the operation, the monkey decides which monkey to send the new number to. The requirement was to compute how many numbers were thrown away by each monkey after a number of rounds.
+
+The difference between part (a) and part (b) were the operations with the numbers. The results of the operations at part (a) were reasonably small numbers, but at part (b) you would very easily start to get huge numbers that didn't even fit to 64 bits fairly quickly, so you had to come up with a trick to keep the numbers under control. Figuring out why the approach from part (a) is failing and the trick to avoid that is not straightforward and might take some time, thus awarding the _monke_-s with three Christmas Trees in difficulty: 🎄🎄🎄
+
+12. [🏁🌳⛵](./12-hill-climbing-algorithm/): shortest path
+
+We knew this had to come eventually: the first backtracking problem! This one is quite a classic though: you start from one place in a matrix and you have to find the shortest path to a different place, with the condition that the neighbours you can go to from some point are based on the letter they have. Part (b) is not that much different, except that there are multiple starting points and you must additionaly find the starting point which gives the shortest path.
+
+The idea to solve this problem is pretty well-known, and that is, [bread-first search](https://www.geeksforgeeks.org/shortest-path-unweighted-gr) (commonly referred to as `BFS`). The idea for part (b) is almost identical, known as [multi-source bfs](https://www.geeksforgeeks.org/multi-source-shortest-path-in-unweighted-graph/). This problem can be done quickly by defining a `getNeighbours(Location) -> Location` and applying these well-known techniques, but because backtracking is a harder concept to graps in general, the problem receives two Christmas Trees in difficulty: 🎄🎄
+
+13. [🔃↔️🔄](./13-distress-signal/): infinite recursion
+
+This problem introduced perhaps one of the most difficult concepts to define formally, and that is, recursive objects. In particular, lists whose items can be either integers, or lists of integers, even emtpy lists. The problem's input is a bunch of pairs of these types of lists, and part (a) requires you to "compare" the lists, based on a recursive method defined by the statement. Part (b) is much easier assuming you got part (a) right; it only requires writing all input lists, together with two additional ones, in the "correct" order based on the comparison method.
+
+There are several tricky parts to this method, that is, defining the recursive object that holds the lists and numbers, and converting between that object and its string representation. Once that's done, implementing the comparison function on the recursive object is less of a challenge since it's clearly defined in the statement, but the string convertion is quite brainy and for this reason, this problem is the first one I decided to give four Christmas Trees in difficulty: 🎄🎄🎄🎄
+
+---
+
+I believe this was the point in the contest where I knew I would be in for quite a ride. Last two problems introduced two of the harder concepts in computer science, backtracking and recursion, and problems started to take increasingly longer to solve. At times I was wondering whether it was the right moment for me to do this challenge, since I often ended up working on these problems after midnight, but this last problem was simply beautiful and I decided to keep going nonetheless.
+
+---
+
+14. [⏳🕰️⛰️](./14-regolith-reservoir/): falling sand
+
+The simulations keep coming, this time sand falling down a map which also contains rocks in various places. The sand falls from some location and when it encounters a rock (or other sand) it can either stop or fall to the left or right. The puzzle input represents the rock patterns on the map, and one unit for sand falls at each step. Part (a) requires to compute the quantity of sand that falls until all new sand units will no longer come to rest and fall down the map (which is guaranteed to happen), where in part (b) a straight rock "border" is placed at the bottom such that sand never falls down, and you have to find when the sand source gets blocked by the pile of sand.
+
+This problem required a fair amount of work: the input is not straightforward to parse, adding the border at part (b) is a bit cumbersome, simulating the sand motion did require a bit of recursivity and due to the nature of the problem, erros are more difficult to debug (you can draw the map, but you have to compute the region of the map you want to draw first, and then actually draw it...). However, the core idea wasn't really that difficult, especially compared to the previous problem and therefore collecting 3 Christmas Trees in difficulty: 🎄🎄🎄

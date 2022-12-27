@@ -145,3 +145,97 @@ I believe this was the point in the contest where I knew I would be in for quite
 The simulations keep coming, this time sand falling down a map which also contains rocks in various places. The sand falls from some location and when it encounters a rock (or other sand) it can either stop or fall to the left or right. The puzzle input represents the rock patterns on the map, and one unit for sand falls at each step. Part (a) requires to compute the quantity of sand that falls until all new sand units will no longer come to rest and fall down the map (which is guaranteed to happen), where in part (b) a straight rock "border" is placed at the bottom such that sand never falls down, and you have to find when the sand source gets blocked by the pile of sand.
 
 This problem required a fair amount of work: the input is not straightforward to parse, adding the border at part (b) is a bit cumbersome, simulating the sand motion did require a bit of recursivity and due to the nature of the problem, erros are more difficult to debug (you can draw the map, but you have to compute the region of the map you want to draw first, and then actually draw it...). However, the core idea wasn't really that difficult, especially compared to the previous problem and therefore collecting 3 Christmas Trees in difficulty: 🎄🎄🎄
+
+15. [💎🛑🚧](./15-beacon-exclusion-zone/): map coverage
+
+This next problem is placed in the 2-dimensional plane. It provides the integer coordinates of a few sensors as input, each one being able to scan all points up to a given distance (using Manhattan distance). Part (a) gives a line and asks how many integers points located on that line are detected by these sensors. At part (b), you were given some delimited area where you knew that exactly one point is not scanned by the sensors, and asked to find that point.
+
+With an intuitive approach, one could write a function `isVisible(location, sensor) -> bool` which will get part (a) done, but would be slow for part (b). The catch here is that coordinates are massive: you can compute the manhattan distance instantly but there are multiple sensors and the area at part (b) is 4 million by 4 million, so just checking each individual point is too slow, at least in Golang. Because it did require an optimization, the sensor's coordinates were of the order of millions and computing the bounds of the line at part (a) is slightly trickier (after all you can't check the entire line), this problem covers 3 Christmas Trees in difficulty: 🎄🎄🎄
+
+Btw, if you're parsing the input with regex, watch out for negative numbers. That did cost me one hour 😉
+
+16. [🗻🎡🌋](./16-proboscidea-volcanium/): best-scoring road
+
+The contests introduced again a backtracking problem in day 16. This time there were a bunch of valves and tunnels between them (so basically a graph with edges of length 1) and opening each valve would release a certain amount of pressure each minute (for some valves, that could be 0). At every minute, you could either open a valve or move one edge to a different valve, the requirement being to maximize the released pressure after 30 minutes. Part (b) was pretty much the same, except that you had 26 minutes and a "companion" to open valves with you, that could do the exact same operations.
+
+Unlike week 12, this was a less straight-forward approach of backtracking with DFS (or BFS). One had to construct the graph from an input that wasn't trivial to parse, there were some challenges to model the steps nicely because it's actually harder to store the state minute by minute, and coming with an approach for part (b) does require some thought. The implementation definitely takes some time, and combined with the difficulty made the problem worthy of 4 Christmas Trees: 🎄🎄🎄🎄
+
+---
+
+On a more personal note, this is the first problem that discouraged me because I wasn't able to finish it the day I started it, and neither the next problem which was even harder. I actually completed it on day 21 I think, when I solved 3 problems. I kept doing the really stupid mistake of adding the starting point twice to the input graph at part (b), which kept messing up my final answer. When I realised what the issue was, my reaction was best described by 😒
+
+This is also the first problem I optimized with parallelism, which decreased the time to solve part (b) substantially. I will definitely be looking to add more parallel programming when remastering these problems.
+
+---
+
+17.  [🧱🔷🟩](./17-pyroclastic-flow/): Tetris (or at least something close)
+
+Around the corner was sitting likely the problem that I liked the most. In this next simulation, you had to simulate a game of Tetris, where you were given 5 shapes and a sequence of left or right keyboard inputs. Both the sequence of shapes and keyboard inputs was repeated once it ended, and after each keyboard input the piece dropped exactly one unit. Parts (a) and (b) were the exact same task: to compute the height of the tower after 2022, and 1 trillion rocks fell, respectively.
+
+Yeah, 1 trillion -- you heard that right. Simulating the entire game was possible at part (a) and the approach I went with, but that just wasn't going to cut it for part g(b). The only hope there was finding some patterns. And finding a pattern that is proven mathematically to work is very difficult: what is the condition for the pattern to repeat? There were also 5 different pieces, and 10091 keyboard inputs (in my puzzle input at least). Not only that, but even once you found the pattern, the math behind required to compute the height using the pattern is simply insane.
+
+After solving part (a) fairly quickly, the difficulty increase brought by part (b) was baffling to me. Adding everything together: modelling the input and states, finding the pattern (keep in mind that one can prove in some games there is _no cyclic pattern_) and computing the height based on the pattern, in my opinion completely justifies the maximum number of Christmas Trees I'm giving this problem in difficulty: 🎄🎄🎄🎄🎄
+
+18. [🧊🔥🌪️](./18-boiling-boulders/) structure of mini-cubes
+
+Breaking the monotony of the 2-dimensional space is, in my opinion, one of the most elegant problem of the contest. This one pretty much consisted of placing unit-cubes in the 3-dimensional space. The input was giving the positions of a bunch of `1x1x1` cubes, and at part (a) you had to compute how many faces of these cubes are not touching another cube. Part (b) did make matters more interesting, and the easiest way to visualize the requirement for me is to think that the generated cube structure is plunged into water, and you had to count the number of faces that get wet.
+
+While I managed to get part (a) done really quickly, part (b) brought additional layers of complexity, and did require using your spatial orientation a lot when designing an algorithm to solve it. It the end, still an exploration problem solved by BFS, but understanding what you had to do, visualizing the "hidden" spots not reached by water and coming up with a proven working algorithm is definitely challenging. Generally it is much harder to work with points in space than in the plane, but I'd say the problem was overall a bit easier than the previous one, making 4 Christmas Trees a fair difficulty score: 🎄🎄🎄🎄
+
+19. [🤖⛏️⛑️](./19-not-enough-minerals/) and yet another backtracking problem
+
+I'll just start by saying that this problem did make me want to rip my hair off my head. It is the last problem I submitted, which got me the 50th star. It is a bit similar to finding the best investment: you were given 4 different robots, each being able to gather one type of resource (ore, clay, obsidian, geode) every minute. You were also given multiple blueprints with the cost of each robot, and you had to find out the best strategy to buy robots when you had the resources in order to maximize the number of geodes after 24 minutes, for each blueprint. Part (b) is essentially the same as part (a), except you only had to compute the maximum number of geodes for the first three blueprints, but after 32 minutes.
+
+The technique that solves this one is backtracking with DFS (or BFS but that takes a huge toll on memory) like we've seen before, but the catch is that is suffers terribly from the state-space explosion problem without some good pruning. And finding that good pruning is hard. Even after hashing each possible state and trying to estimate the maximum number of geodes from every state, it still took a good 10 seconds to run part (b), and it would have probably taken days without any pruning at all. I might also be a bit biased here due to solving it last, but because it was challenging to model the states (which for me included the number of robots, number of states and some action) and to find some good pruning then implement it, I consider this problem alongside the "Tetris" one from day 17 to be the only two ones worth 5 Christmas Trees in difficulty: 🎄🎄🎄🎄🎄
+
+Just to strengthen why I think modelling this problem is so difficult, I only figured out on day 25 that my original approach was incorrect and allowed creating robots one round before they were actually created. After fixing this, the state explosion moved from minute 14 to minute 20, which was a significant improvement. I did however also find the statement itself to not reveal that detail clearly; I'll go into more details on the notes I make for the problem on GitHub.
+
+20. [1️⃣♻️#️⃣](./20-grove-positioning-system/) cyclic list
+
+The waters chill down a bit on day 20, after what I think were 3 of the most difficult problems of the contest, one after the other. The statement had much more simplicity, the input being just the elements of a list of integers. The list is considered to be cyclic, as if the elements were in a circle, and for part (a) you had to go through all the elements from the input, and for each one move it on the circle a number of positions equal to its value. So if the element was 3, you'd move it past the 3 next elements, if it was -2 you'd move it before the previous two elements. Part (b) was the same, except that the numbers were all multiplied by some large number like `811589153`, and you had to repeat the process by going through the original list of numbers 10 times. The task required to find the numbers on three positions.
+
+Although this problem is nowhere near as difficult as the previous one, it still has its quirks. There's deciding on how to store the elements; if using a normal array, moving the elements has some edge cases, otherwise one could implement a linked list. Also, one should implement an optimization to avoid unnecessary round trips around the circle of numbers. And keep in mind that there are also duplicates, meaning that you have to know which number to move. Figuring all of these out increased the time I spent on this problem way past what I thought initially it would take me, for which reason I grant the problem three Christmas Trees in difficulty: 🎄🎄🎄
+
+---
+
+Fun fact: I originally got the answer wrong by using an array implementation, so I switched completely to using a linked list. I still got the same answer, though. It turned out that I changed my implementation completely just to find out that I had copied the answer from Microsoft's calculator with a comma: `27,726` instead of `27726` 🙄. Nevertheless, I much prefer the linked list approach, but I would have rather done to something else than spending one more hour on this at 2 a.m.
+
+---
+
+21. [〰️🔱🌿](./21-monkey-math/) doing math with recursion and binary search trees
+
+Coding the solution to this problem was just nice. You were given a bunch of math expressions: on the left side, some variable. On the right side, either a math expression (+,-,/,*) with two different variables or some value. So basically you either knew the value of the variable, or had to compute it by going through the sub-expressions of the variables in the original variable's expression, recursively. You can see how this leads nicely to a binary tree of expressions. For part (a), you had to find the expression of the `root` variable, which was the top of the tree.
+
+While part (a) was a simple recursion, part (b) was much more challenging. There was a variable called `humn` that had a value initially, but this time you had to specify which value it needs to have such that the two parts of the `root` expression have equal values. This did require coming up with a clever way to parse the tree to get an expression for `humn`, which was a leaf in the tree. Seeing the approach is not straightforward, and recursivity and binary trees are hard concepts, thus my expressions determined that four Christmans Trees is the value for the difficulty variable: 🎄🎄🎄🎄
+
+22. [🦧🗺️🎪](./22-monkey-map/): expanded cubes
+
+Incoming simulation alert: this time, an oddly shaped map and a set of moves and direction changes as input. Basically, you knew how many places to go forward before changing the direction to either left or right. For part (a), when you fell off the map, you spawned in the opposite location on the same line or column. There were also rocks that could obstruct your movement, even at the other end, when you tried to wrap across the map. Part (a) required to compute the final location after the moves were completed.
+
+The contest did make us familiar with simulations, and thus part (a) was nothing out of the ordinary. At part (b) though, it turned out that the map is in fact the expanded version of a cube, and on the two-dimensional expansion you had to simulate moving on the cube's faces. This significantly ramped up the difficulty, because mapping the edges to one another was a pain, and the behaviour now depended on direction too around the corners. There was also a very subtle trap at part (b) you could fall into if you were interpreting directions in a particular way at part (a) that I'll be discussing on the problem's page, and for all these reasons this was amongst the harder simulations, paving the path to 4 Christmas Trees in difficulty for the problem: 🎄🎄🎄🎄
+
+23 [🗺️🏔️🌱](./23-unstable-diffusion/) another map simulation??
+
+Severe simulation warning ⚠️. However, this time an easier one. Your input is a bunch of elves' locations on an infinite map. At each step, you know a list of directions where each elf can move, and the elves can move in a direction if they aren't "too close" to neighbouring elves, or isolated from them. At part (a), you had to enclose the elves in a square with smallest area after simulating 10 moves, and had to count the empty squares. And at part (b), you simply had to run the simulation until all elves were isolated from their neighbours, answering with the number of rounds it took to reach there.
+
+Overall, the movements and move conditions were pretty well explained and easy to model, but there were trickier parts, in particular, dealing with an infinite grid and addressing move conflicts. This type of problem is also not easy to debug, especially if the number of elves is large, therefore receiving a total number of three Christmas Trees in difficulty: 🎄🎄🎄
+
+24 [➡️🚸⛈️](./24-blizzard-basin/) path finding on moving map
+
+Last backtracking problem. Well, at least it was a challenging one. The input is a bounded map in the shape of a rectangle, a starting point and a finish point. On the map, there are also a big number of winds going in one of four directions, passing through each other and wrapping around the map when they reach the bounds. You just have to find the shortest path from start to finish, with the constraint that you must never be on the same tile with a wind. Part (b) is basically the same task, repeated three times: you need to find the shortest path from start to finish, then finish to start, and then back again start to finish (there will be different paths because winds will be in different positions).
+
+Of course, the main technique is still backtracking with BFS, but there's the additional difficulty of keeping track of the wind positions at each step, actually moving the winds, and remembering to move if a wind takes your place (it is guaranteed that you have a valid place to move). Moreover, you will need some pruning techniques, otherwise your algorithm will run in hours (at least in Go). Thankfully, exploring (step, location) pairs reached via different paths only once is a good enough pruning which allows BFS to complete in a few minutes, but the difficulty is still there and there was quite a lot of work to simulate those winds, making this problem one step above the previous simulation in difficulty at four Christmas Trees: 🎄🎄🎄🎄
+
+25 [❓➗5️⃣](./25-full-of-hot-air/) a different form of base 5 numbers
+
+After a bumpy ride, the adventure finally comes to and end with, luckily for me, a math puzzle. The problem comes up with a different system to write numbers, the possible digits being `2`,`1`,`0`,`-`,`=` with values `2`,`1`,`0`,`-1`,`-2` respectively. To compute the value of a number written with these digits, simply multiply each number with 5 to the power of its position and add those together, for example, `2=1` is `2*5^2 - 2*5^1 + 1*5^0 = 50 - 10 + 1 = 41`. The problem had only one part: you were given a list of numbers using this representation, had to add them up and write the sum using this representation.
+
+Luckily, there were no negative numbers, and all you really had to do was writing number modulo 5 in a slightly different way. Converting to base 10 is done in the same way, and once you replace the possible remainder values with the set `{-2,1,0,1,2}`, all there is left to do is re-define the quotient and remainder modulo 5 as `q = (x+2)/5` and `q = (x+2)%5-2`, the standard technique of converting to base 5 can be used for this new counting system. I likely found this really simple because of being a mathematician in the past, but I still think the conversions could be a bit tricky to get right, and one also needs to associate with the symbols of the new counting system, making the end of this contest marked by a nice two Christmas Tree difficult problem: 🎄🎄
+
+---
+
+Note: thinking about how to do the conversions for negative numbers gets interesting, because the "zero" values don't align: a negative number can start with 1 in the new counting system. I will likely cover that too on the problem's page.
+
+---
+
+That was the end of the 2022 Advent of Code contest. I had a tremendous amount of fun, and for those of you who participated, I hope you also enjoyed the journey! Overall, the puzzles and story were really well-thought, and I believe it took a lot of effort to generate such relevant puzzle inputs.

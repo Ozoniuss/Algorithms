@@ -105,7 +105,7 @@ func stringToLeveled(leveledString string) leveledArray {
 
 		return arr
 
-		// If the current string is an element, just return its string
+		// If the current string is an element, just return its leveled array
 		// representation.
 	} else {
 		val, _ := strconv.Atoi(leveledString)

@@ -21,6 +21,7 @@ func add(d1 Location, d2 Direction) Location {
 	return Location{d1[0] + d2[0], d1[1] + d2[1]}
 }
 
+// dirFromString converts a direction from string to Direction.
 func dirFromString(dir string) Direction {
 	if dir == "U" {
 		return UP

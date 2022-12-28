@@ -9,7 +9,7 @@ import (
 )
 
 func roundTrip(value string) bool {
-	return value == stringLeveled(fromLeveled(value))
+	return value == leveledToString(stringToLeveled(value))
 }
 
 func TestLeveled() {
@@ -30,14 +30,14 @@ type leveledArray struct {
 	array   []leveledArray
 }
 
-func stringLeveled(l leveledArray) string {
-
+// leveledToString converts a leveled array to its string form.
+func leveledToString(l leveledArray) string {
 	if l.array == nil {
 		return fmt.Sprint(l.element)
 	} else {
 		out := "["
 		for _, a := range l.array {
-			out += stringLeveled(a) + ","
+			out += leveledToString(a) + ","
 		}
 		out = strings.TrimSuffix(out, ",")
 		out += "]"
@@ -45,45 +45,70 @@ func stringLeveled(l leveledArray) string {
 	}
 }
 
-// fromLeveled takes as input a string which could be a possible representation
-// of a leveled array and turns it into a leveled array.
-func fromLeveled(l string) leveledArray {
+// stringToLeveled converts a leveled array represented as a string into a
+// leveledArray object. It is assumed that the string represents a valid
+// array.
+func stringToLeveled(leveledString string) leveledArray {
 
-	// this always means the last parentheses is also ']'
-	if l[0] == '[' {
-		if l[1] == ']' {
+	// The string represents an array, level 0 array (an element). This
+	// always means the last parentheses of the string is also ']'.
+	if leveledString[0] == '[' {
+		// Empty array special case.
+		if leveledString[1] == ']' {
 			return leveledArray{
 				array: make([]leveledArray, 0, 0),
 			}
 		}
 		positions := [][2]int{}
 		start := 1
+		// Open bracket counter. It is increased by 1 if an open bracket is
+		// found, and decreased by 1 if a closed bracket is found. Whenever
+		// this is 0, we know that the string we're currently parsing from the
+		// top level items is an element (level 0 array), otherwise when this
+		// bracket gets closed we know we just read an array item.
 		inArray := 0
-		for i := 1; i < len(l)-1; i++ {
-			if l[i] == '[' {
+
+		// The idea here is, call this function recursively for all top-level
+		// elements of the current string representation, whether they are
+		// level 0 arrays or higher level arrays. What this does is determine
+		// a list of starting and ending positions: each such pairs of positions
+		// denotes the starting and ending point of the string representation
+		// of a top-level item inside the provided array, and we will call this
+		// function recursively to determine the leveled array objects each of
+		// the items represent in order to add them as items to the current
+		// leveled array.
+		for i := 1; i < len(leveledString)-1; i++ {
+			if leveledString[i] == '[' {
 				inArray += 1
-			} else if l[i] == ']' {
+			} else if leveledString[i] == ']' {
 				inArray -= 1
 			} else if inArray == 0 {
-				if l[i] == ',' {
+				// Bracket counter is 0, we either read the string
+				// representation of an element or an array.
+				if leveledString[i] == ',' {
+					// Add the positions of that string to the positions list.
 					positions = append(positions, [2]int{start, i})
 					start = i + 1
 				}
 			}
 		}
-		positions = append(positions, [2]int{start, len(l) - 1})
+		// The first-to-last character is the ending position of the last
+		// top-level item.
+		positions = append(positions, [2]int{start, len(leveledString) - 1})
 		arr := leveledArray{
 			array: []leveledArray{},
 		}
+		// Convert all the top-level items from string to leveledArray.
 		for _, p := range positions {
-			arr.array = append(arr.array, fromLeveled(l[p[0]:p[1]]))
+			arr.array = append(arr.array, stringToLeveled(leveledString[p[0]:p[1]]))
 		}
 
 		return arr
 
-		// The only case left is number
+		// If the current string is an element, just return its string
+		// representation.
 	} else {
-		val, _ := strconv.Atoi(l)
+		val, _ := strconv.Atoi(leveledString)
 		return leveledArray{
 			element: val,
 		}
@@ -176,8 +201,8 @@ func main() {
 			line := scanner.Text()
 			if line == "" {
 				leveledArrayStrings := strings.Split(out, "\n")
-				l1 := fromLeveled(leveledArrayStrings[0])
-				l2 := fromLeveled(leveledArrayStrings[1])
+				l1 := stringToLeveled(leveledArrayStrings[0])
+				l2 := stringToLeveled(leveledArrayStrings[1])
 				if compare(l1, l2) == -1 {
 					rightOrder = append(rightOrder, idx)
 				}
@@ -202,7 +227,7 @@ func main() {
 		for scanner.Scan() {
 			line := scanner.Text()
 			if line != "" {
-				all = append(all, fromLeveled(line))
+				all = append(all, stringToLeveled(line))
 			}
 		}
 
@@ -238,11 +263,11 @@ func main() {
 
 		decoders := [2]int{}
 		for idx, larr := range all {
-			fmt.Printf("%d:%s\n", idx+1, stringLeveled(larr))
-			if stringLeveled(larr) == "[[2]]" {
+			fmt.Printf("%d:%s\n", idx+1, leveledToString(larr))
+			if leveledToString(larr) == "[[2]]" {
 				decoders[0] = idx + 1
 			}
-			if stringLeveled(larr) == "[[6]]" {
+			if leveledToString(larr) == "[[6]]" {
 				decoders[1] = idx + 1
 			}
 		}

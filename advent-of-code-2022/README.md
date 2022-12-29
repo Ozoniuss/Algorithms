@@ -184,7 +184,7 @@ The technique that solves this one is backtracking with DFS (or BFS, but that ta
 
 Just to strengthen why I think modelling this problem is so difficult, I only figured out on day 25 that my original approach was incorrect and allowed creating robots one round before they were actually created, so I had to come up with a way that signaled if robots are built during the current state. After fixing this, the state explosion moved from minute 14 to minute 20, which was a significant improvement. I did however also find the statement itself to not reveal that detail clearly.
 
-20.  [1️⃣♻️#️⃣](./20-grove-positioning-system/) cyclic list
+20. [1️⃣♻️#️⃣](./20-grove-positioning-system/) cyclic list
 
 The waters chill down a bit on [day 20](https://adventofcode.com/2022/day/20), after what I think were 3 of the most difficult problems of the contest, one after the other. The statement had much more simplicity, the input being just the elements of a list of integers. The list is considered to be cyclic, as if the elements were in a circle, and for part 1 you had to go through all the elements from the input, and for each one move it on the circle a number of positions equal to its value. So if the element was 3, you'd move it past the 3 next elements, if it was -2 you'd move it before the previous two elements. Part 2 was the same, except that the numbers were all multiplied by some large number like `811589153`, and you had to repeat the process by going through the original list of numbers 10 times. The task required to find the numbers on three positions.
 
@@ -208,28 +208,40 @@ Incoming simulation alert: [this time](https://adventofcode.com/2022/day/22), an
 
 The contest did make us familiar with simulations, and thus part 1 was nothing out of the ordinary. At part 2 though, it turned out that the map is in fact the expanded version of a cube, and on the two-dimensional expansion you had to simulate moving on the cube's faces. This significantly ramped up the difficulty, because mapping the edges to one another was a pain, and the behaviour now depended on direction too on the map's corners. Additionally, if you interpreted the input as a list with the direction in which you move every step, that would get messed up at part 2 because wrapping around the map could change direction (which cost me one hour...). This was amongst the harder simulations, but mostly a lot of work and not necessarily a difficult idea. The amount of work was still substantial, paving the path to 4 Christmas Trees in difficulty for the puzzle: 🎄🎄🎄🎄
 
-23 [🗺️🏔️🌱](./23-unstable-diffusion/) another map simulation??
+23. [🗺️🏔️🌱](./23-unstable-diffusion/) another map simulation??
 
 What, tired of simulations? You should have heard today's severe simulation warning⚠️. However, this time an easier [one](https://adventofcode.com/2022/day/23). Your input is a bunch of elves' locations on an infinite map. At each step, you know a list of directions where each elf can move, and the elves can't move in a direction if they are "too close" to neighbouring elves, or completely isolated. At part 1, you had to enclose the elves in a square with smallest area after simulating 10 moves, and had to count the empty squares. And at part 2, you simply had to run the simulation until all elves were isolated from their neighbours, obstructing all movement, and answer with the number of rounds it took to reach there.
 
 Overall, the movements and move conditions were pretty well explained and easy to model, but there were trickier parts, in particular, dealing with an infinite grid and addressing move conflicts. This type of problem is also not easy to debug, especially if the map is large, therefore receiving a total number of three Christmas Trees in difficulty: 🎄🎄🎄
 
-24 [➡️🚸⛈️](./24-blizzard-basin/) path finding on changing map
+24. [➡️🚸⛈️](./24-blizzard-basin/) path finding on changing map
 
 Last backtracking [puzzle](https://adventofcode.com/2022/day/24). Well, at least it was a challenging one. The input is a bounded map in the shape of a rectangle, a starting point and a finish point. On the map, there are also a big number of winds called blizzards going in one of four directions, passing through each other and wrapping around the map when they reach the bounds. You just have to find the shortest path from start to finish, with the constraint that you must never be on the same tile with a blizzard. Part 2 is basically the same task, repeated three times: you need to find the shortest path from start to finish, then finish to start, and then back again start to finish (there will be different paths because blizzards will be in different positions).
 
 Of course, the main technique is still backtracking with BFS, but there's the additional difficulty of keeping track of the wind positions at each step, actually moving the winds, and remembering to move if a wind takes your place (it is guaranteed that you have a valid place to move). Moreover, you will need some pruning techniques, otherwise your algorithm will run in hours (at least in Go). Thankfully, exploring (step, location) pairs reached via different paths only once is a good enough pruning which allows BFS to complete in a few minutes, but the difficulty is still there and there was quite a lot of work to simulate those winds, making this problem one step above the previous simulation in difficulty at four Christmas Trees: 🎄🎄🎄🎄
 
-25 [❓➗5️⃣](./25-full-of-hot-air/) a different form of base 5 numbers
+25. [❓➗5️⃣](./25-full-of-hot-air/) a different form of base 5 numbers
 
-After a bumpy ride, the adventure finally comes to and end with, luckily for me, a math puzzle. The problem comes up with a different system to write numbers, the possible digits being `2`,`1`,`0`,`-`,`=` with values `2`,`1`,`0`,`-1`,`-2` respectively. To compute the value of a number written with these digits, simply multiply each number with 5 to the power of its position and add those together, for example, `2=1` is `2*5^2 - 2*5^1 + 1*5^0 = 50 - 10 + 1 = 41`. The problem had only one part: you were given a list of numbers using this representation, had to add them up and write the sum using this representation.
+After a bumpy ride, the adventure finally comes to an end with, luckily for me, a [math puzzle](https://adventofcode.com/2022/day/25). The problem comes up with a different counting system to write numbers, called SNAFU, the possible digits being `2`,`1`,`0`,`-`,`=` with values `2`,`1`,`0`,`-1`,`-2` respectively. To compute the decimal value of a number written in SNAFU, simply multiply each number with 5 to the power of its position and add those together, for example, `2=1` is `2*5^2 - 2*5^1 + 1*5^0 = 50 - 10 + 1 = 41`. The problem had only one part: you were given a list of numbers using this representation, had to add them up and write the sum as SNAFU.
 
-Luckily, there were no negative numbers, and all you really had to do was writing number modulo 5 in a slightly different way. Converting to base 10 is done in the same way, and once you replace the possible remainder values with the set `{-2,1,0,1,2}`, all there is left to do is re-define the quotient and remainder modulo 5 as `q = (x+2)/5` and `q = (x+2)%5-2`, the standard technique of converting to base 5 can be used for this new counting system. I likely found this really simple because of being a mathematician in the past, but I still think the conversions could be a bit tricky to get right, and one also needs to associate with the symbols of the new counting system, making the end of this contest marked by a nice two Christmas Tree difficult problem: 🎄🎄
-
----
-
-Note: thinking about how to do the conversions for negative numbers gets interesting, because the "zero" values don't align: a negative number can start with 1 in the new counting system. I will likely cover that too on the problem's page.
+Luckily, there were no negative numbers, and all you really had to do was follow the same process of converting to and from base 5, in a slightly different way. Converting from SNAFU to decimal is identical, and once you replace the possible remainder values with the set `{-2,1,0,1,2}`, you can re-define the quotient and remainder modulo 5 as `q = (x+2)/5` and `q = (x+2)%5-2`. Then, the standard technique of converting to base 5 can be used for this new counting system. I likely found this really simple because of being a mathematician in the past, but I still think the conversions could be a bit tricky to get right, and one also needs to associate with the symbols of the new counting system, making the end of this contest marked by a nice two Christmas Tree difficult problem: 🎄🎄
 
 ---
 
-That was the end of the 2022 Advent of Code contest. I had a tremendous amount of fun, and for those of you who participated, I hope you also enjoyed the journey! Overall, the puzzles and story were really well-thought, and I believe it took a lot of effort to generate such relevant puzzle inputs.
+Note: thinking about how to do the conversions for negative numbers gets interesting, because the "zero" values don't align: a negative number can start with 1 in the new counting system.
+
+---
+
+That was the end of the 2022 Advent of Code contest. I had a tremendous amount of fun, and for those of you who participated, I hope you also enjoyed the journey! Overall, the puzzles and story were really well-thought, and they definitely help you improve your coding skills.
+
+In the end, here are all the problems ordered by difficulty, in no particular order for those with the same difficulty.
+
+- 🎄🎄🎄🎄🎄: days 17, 19
+
+- 🎄🎄🎄🎄: days 13, 16, 18, 21, 22, 24
+
+- 🎄🎄🎄: days 7, 9, 10, 11, 14, 15, 20, 23
+
+- 🎄🎄: days 5, 12, 25
+
+- 🎄: days 1, 2, 3, 4, 6, 8

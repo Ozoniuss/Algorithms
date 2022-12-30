@@ -179,6 +179,22 @@ I started thinking about it mathematically, and realized that in the following s
 - you are at a specific location in the keyboard input array;
 - the difference in altitude from the height where the new piece spawned to the "bottom" (determined by a rock or the starting border) of each of the seven columns, which I called the "altitude pattern", have 7 specific values.
 
+```
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|.......|     This is an example to illustrate the altitude pattern. Starting 
+|.......|     from the bottom row of the new piece, count the number of empty
+|..#....|     spaces on each column, until you get blocked. In this case, we
+|..#....|     obtain [5,5,3,5,6,8,9] as the altitude pattern.
+|####...|
+|..###..|
+|...#...|
+|..####.|
++-------+
+```
+
 If we reach one of the states above at least twice, that is, same piece, same keyboard input position, and same distances from the piece to the bottom of all the 7 columns, we are guaranteed that this exact scenario has happened in the past, and that it will generate the same exact rock pattern until it repeats again. It's just like playing one game that had already been played before.
 
 To store the already encountered patterns and use it to compute the height, you would create an hash of the three values described above (the piece, the position in the input array, and an array of length 7 representing the altitude pattern), and map this object to the units it added in height to the existing structure, once the piece dropped. Additionally, you would have to keep track of _when_ the hash occurred, so you know which of these hashes would occur next when using the pattern. I did that by creating a vector of these hashes, but you could also attach for each hash a pointer to the next hash (although this makes it difficult to compare hashes).

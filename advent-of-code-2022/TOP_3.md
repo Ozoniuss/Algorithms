@@ -52,6 +52,8 @@ This approach doesn't reveal though how you count the wet faces, which is the ac
 - touching the structure;
 - actually part of the structure.
 
+![Possible neighbours](img/day18.png)
+
 The first and last case aren't relevant, but the second case is. The second case actually stands for water touching faces of the cube structure. The trick here is that a common face between two cubes is unique for those two cubes, so assuming you keep track of the already-generated water, you will never be counting the same face twice.
 
 On a final note, there are some nice visual representations of this problem on the [subreddit.](https://www.reddit.com/r/adventofcode/)
@@ -94,6 +96,8 @@ For the string to `leveledArray` conversion, my idea was as follows:
 - define a function `stringToLeveled(leveledString String)` that takes the string representation of a leveled array as input; it is assumed that the string represents a valid leveled array;
 - if the string doesn't start with a bracket, it means that it is an element, so just return it as a leveled-array with `array` set to `nil`;
 - if the string starts with a bracket, find the strings representing all top-level elements from the main string, and call this function recursively on those strings to add them as items of a `leveledArray`.
+
+![Strings of top-level elements](img/day13.png)
 
 The last point sounds easy on paper, but it's a bit more challenging. You can't just separate items by commas, because the string representation could have commas inside sub-arrays, like `[1,[2,3]]` which would no longer determine top-level elements. You also can't just look for brackets, because they might not necessarily indicate a top-level array: `[1,[[2],3]]`. In the two examples, what were are looking for is `1`, `[2,3]` and `1`,`[[2],3]`.
 

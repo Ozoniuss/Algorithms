@@ -223,8 +223,6 @@ func maxTheoreticalGeode(s EconomyState, bp Blueprint, rounds int) int {
 		}
 	}
 
-	//fmt.Println("clay robot at minute", s.minute)
-
 	// Same approach as above for obsidian robots. Note that it's not possible
 	// to have an obsidian robot before having a clay robot, so the first if
 	// should be checked first.
@@ -275,12 +273,8 @@ func maxTheoreticalGeode(s EconomyState, bp Blueprint, rounds int) int {
 
 func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, rounds int) {
 
-	// Remove the current state from the hash map.
-	//delete(hashes, current)
-
 	// Increase the minute before the collection.
 	current.state.minute++
-	//fmt.Println(current.state.minute)
 
 	if maxTheoreticalGeode(current.state, bp, rounds) <= *maxGeode {
 		return
@@ -308,9 +302,9 @@ func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, 
 	}
 
 	// Execute the action.
-
 	current.state = current.action.doAction(current.state, bp)
 
+	// The meaning of these variables is explained below.
 	dontBuyOre := false
 	dontBuyClay := false
 	dontBuyObsidian := false
@@ -322,18 +316,20 @@ func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, 
 		dontBuyOre = true
 	}
 
-	// Have the clay for an obsidian robot at any round, there's no need to
-	// buy clay anymore.
+	// Have the clay for an obsidian robot at every round. In this case you
+	// should never buy clay robots anymore.
 	if current.state.clayRobots >= bp.obsidianCost[1] {
 		dontBuyClay = true
 	}
 
+	// Have the obsidian for a geode robot at every round. In this case you
+	// should never buy obsidian robots anymore.
 	if current.state.obsidianRobots >= bp.geodeCost[1] {
 		dontBuyObsidian = true
 	}
 
-	// Same as clay for obsidian. In this case, only buy geode robots from
-	// now on.
+	// If you can buy geode robots at every round, it doesn't make sense to buy
+	// other robots.
 	if current.state.obsidianRobots >= bp.geodeCost[1] && current.state.oreRobots >= bp.geodeCost[0] {
 		act := BuyGeode{}
 		stat := State{
@@ -345,8 +341,8 @@ func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, 
 		return
 	}
 
-	// If I can buy any of the robots, it's completely pointless to wait
-	// further.
+	// If I can buy any of the robots, don't consider a wait action the next
+	// round.
 	if canBuyClay(current.state, bp) &&
 		canBuyOre(current.state, bp) &&
 		canBuyGeode(current.state, bp) &&
@@ -358,40 +354,32 @@ func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, 
 
 	// We're only interested in buying robots if we can buy them next round
 	// and it actually makes sense to buy more.
-
 	if !dontBuyOre && canBuyOre(current.state, bp) {
 		acts = append(acts, BuyOre{})
-		//fmt.Println("adding ore action")
 	}
 	if !dontBuyClay && canBuyClay(current.state, bp) {
 		acts = append(acts, BuyClay{})
-		//fmt.Println("adding clay action")
 
 	}
 	if !dontBuyObsidian && canBuyObsidian(current.state, bp) {
 		acts = append(acts, BuyObsidian{})
-		//fmt.Println("adding obs action")
 
 	}
 	if canBuyGeode(current.state, bp) {
 		acts = append(acts, BuyGeode{})
-		//fmt.Println("adding geode action")
 
 	}
 	if !doSomething {
 		acts = append(acts, VoidAction{})
 	}
-	//fmt.Println("acts", len(acts))
 	for _, act := range acts {
 		stat := State{
 			state:  current.state,
 			action: act,
 		}
 		if _, ok := hashes[stat]; !ok {
-
 			hashes[stat] = struct{}{}
 			dfs(stat, bp, maxGeode, hashes, rounds)
-
 		}
 	}
 
@@ -445,7 +433,6 @@ func main() {
 			quality += maxGeode * bp.ID
 		}
 		fmt.Println(time.Since(t))
-
 		fmt.Printf("Quality level: %d", quality)
 	} else {
 		t := time.Now()

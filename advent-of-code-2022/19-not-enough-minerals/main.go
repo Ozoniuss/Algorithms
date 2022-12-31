@@ -273,9 +273,6 @@ func maxTheoreticalGeode(s EconomyState, bp Blueprint, rounds int) int {
 
 func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, rounds int) {
 
-	// Increase the minute before the collection.
-	current.state.minute++
-
 	if maxTheoreticalGeode(current.state, bp, rounds) <= *maxGeode {
 		return
 	}
@@ -336,8 +333,11 @@ func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, 
 			state:  current.state,
 			action: act,
 		}
-		hashes[stat] = struct{}{}
-		dfs(stat, bp, maxGeode, hashes, rounds)
+		stat.state.minute++
+		if _, ok := hashes[stat]; !ok {
+			hashes[stat] = struct{}{}
+			dfs(stat, bp, maxGeode, hashes, rounds)
+		}
 		return
 	}
 
@@ -359,24 +359,23 @@ func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, 
 	}
 	if !dontBuyClay && canBuyClay(current.state, bp) {
 		acts = append(acts, BuyClay{})
-
 	}
 	if !dontBuyObsidian && canBuyObsidian(current.state, bp) {
 		acts = append(acts, BuyObsidian{})
-
 	}
 	if canBuyGeode(current.state, bp) {
 		acts = append(acts, BuyGeode{})
-
 	}
 	if !doSomething {
 		acts = append(acts, VoidAction{})
 	}
+
 	for _, act := range acts {
 		stat := State{
 			state:  current.state,
 			action: act,
 		}
+		stat.state.minute++
 		if _, ok := hashes[stat]; !ok {
 			hashes[stat] = struct{}{}
 			dfs(stat, bp, maxGeode, hashes, rounds)
@@ -401,7 +400,7 @@ func main() {
 	}
 
 	initialState := EconomyState{
-		minute: 0,
+		minute: 1,
 		ResourceCount: ResourceCount{
 			ore:      0,
 			clay:     0,

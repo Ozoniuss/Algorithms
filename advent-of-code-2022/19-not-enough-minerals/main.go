@@ -226,8 +226,13 @@ func maxTheoreticalGeode(s State, bp Blueprint, rounds int) int {
 		}
 		// Once I have the ore to build a clay robot, the next state I build it.
 		economy.clayRobots += 1
-		economy.minute += 1
-		if economy.minute == rounds+1 {
+
+		// In the first round after buying a clay robot I will never be able
+		// to buy another clay robot, even if I get the necessary resources,
+		// because I would have to wait one more round.
+		economy.minute += 2
+		economy.clay += 1
+		if economy.minute >= rounds+1 {
 			return economy.geode
 		}
 	}
@@ -248,8 +253,13 @@ func maxTheoreticalGeode(s State, bp Blueprint, rounds int) int {
 			}
 		}
 		economy.obsidianRobots += 1
-		economy.minute += 1
-		if economy.minute == rounds+1 {
+
+		// In the first round after buying an obsidian robot I will never be
+		// able to buy another clay robot, even if I get the necessary
+		// resources, because I would have to wait one more round.
+		economy.minute += 2
+		economy.obsidian += 1
+		if economy.minute >= rounds+1 {
 			return economy.geode
 		}
 	}
@@ -265,8 +275,13 @@ func maxTheoreticalGeode(s State, bp Blueprint, rounds int) int {
 			}
 		}
 		economy.geodeRobots += 1
-		economy.minute += 1
-		if economy.minute == rounds+1 {
+
+		// In the first round after buying a geode robot I will never be able
+		// to buy another geode robot, even if I get the necessary resources,
+		// because I would have to wait one more round.
+		economy.geode += 1
+		economy.minute += 2
+		if economy.minute >= rounds+1 {
 			return economy.geode
 		}
 	}
@@ -429,7 +444,7 @@ func main() {
 		action:  VoidAction{},
 	}
 
-	part := 2
+	part := 1
 	if part == 1 {
 		t := time.Now()
 		quality := 0

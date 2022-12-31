@@ -14,6 +14,8 @@ Below you can find a _very simplified_ summary of all the contest's problems. Th
 
 ### Enjoy!
 
+> Read the updated version of this article on my [medium story](https://medium.com/@ozoniuss/advent-of-code-2022-contest-overview-and-puzzles-rating-2eb68266a80f).
+
 ---
 
 1. [🍩🍫🍪](./01-calorie-counting/): intro

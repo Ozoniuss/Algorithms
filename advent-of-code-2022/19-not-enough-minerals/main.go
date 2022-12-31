@@ -6,17 +6,20 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"time"
 )
 
+// Mineral is an enum defining all possible minerals.
 type Mineral int
 
 const (
-	ORE      = 0
-	CLAY     = 1
-	OBSIDIAN = 2
-	GEODE    = 3
+	ORE Mineral = iota
+	CLAY
+	OBSIDIAN
+	GEODE
 )
 
+// Blueprint stores all the data that is available from a blueprint.
 type Blueprint struct {
 	ID           int
 	oreCost      int
@@ -25,6 +28,7 @@ type Blueprint struct {
 	geodeCost    [2]int
 }
 
+// mustAtoi is a helper that makes strconv.Atoi annoy me less.
 func mustAtoi(s string) int {
 	val, err := strconv.Atoi(s)
 	if err != nil {
@@ -33,6 +37,7 @@ func mustAtoi(s string) int {
 	return val
 }
 
+// max returns the maximum element of an array of integers.
 func max(nums []int) int {
 	max := -1
 	for _, num := range nums {
@@ -60,40 +65,66 @@ func processLine(line string) Blueprint {
 	}
 }
 
-type State struct {
-	minute         int
+// ResourceCount stores the amount of resources available.
+type ResourceCount struct {
+	ore      int
+	clay     int
+	obsidian int
+	geode    int
+}
+
+// RobotCount stores the number of robots.
+type RobotCount struct {
 	oreRobots      int
-	ore            int
 	clayRobots     int
-	clay           int
 	obsidianRobots int
-	obsidian       int
 	geodeRobots    int
-	geode          int
 }
 
-// Action is the interface that each buying action must implement.
+// EconomyState stores all the relevant information that is relevant for each state of
+// the exploration.
+type EconomyState struct {
+	// minute is relevant for the economy, because the economy grows with time.
+	minute int
+	ResourceCount
+	RobotCount
+}
+
+// Action is the interface that every possible action during a round must
+// implement.
 type Action interface {
-	doAction(s State, bp Blueprint) State
+	doAction(s EconomyState, bp Blueprint) EconomyState
 }
 
-// This round, no robot is bought.
+// No robot is bought.
 type VoidAction struct{}
 
+// An ore robot is bought.
 type BuyOre struct {
 }
+
+// A clay robot is bought.
 type BuyClay struct {
 }
+
+// An obsidian robot is bought.
 type BuyObsidian struct {
 }
+
+// A geode robot is bought.
 type BuyGeode struct {
 }
 
-func (v VoidAction) doAction(s State, bp Blueprint) State {
+/*
+	The changes in state reflected by performing each action, as described in
+	the problem statement.
+*/
+
+func (v VoidAction) doAction(s EconomyState, bp Blueprint) EconomyState {
 	return s
 }
 
-func (b BuyOre) doAction(s State, bp Blueprint) State {
+func (b BuyOre) doAction(s EconomyState, bp Blueprint) EconomyState {
 	s.ore -= bp.oreCost
 	if s.ore < 0 {
 		panic("something bad happened")
@@ -102,7 +133,7 @@ func (b BuyOre) doAction(s State, bp Blueprint) State {
 	return s
 }
 
-func (b BuyClay) doAction(s State, bp Blueprint) State {
+func (b BuyClay) doAction(s EconomyState, bp Blueprint) EconomyState {
 	s.ore -= bp.clayCost
 	if s.ore < 0 {
 		panic("something bad happened")
@@ -111,7 +142,7 @@ func (b BuyClay) doAction(s State, bp Blueprint) State {
 	return s
 }
 
-func (b BuyObsidian) doAction(s State, bp Blueprint) State {
+func (b BuyObsidian) doAction(s EconomyState, bp Blueprint) EconomyState {
 	s.ore -= bp.obsidianCost[0]
 	s.clay -= bp.obsidianCost[1]
 	if s.ore < 0 || s.clay < 0 {
@@ -120,7 +151,7 @@ func (b BuyObsidian) doAction(s State, bp Blueprint) State {
 	s.obsidianRobots += 1
 	return s
 }
-func (b BuyGeode) doAction(s State, bp Blueprint) State {
+func (b BuyGeode) doAction(s EconomyState, bp Blueprint) EconomyState {
 	s.ore -= bp.geodeCost[0]
 	s.obsidian -= bp.geodeCost[1]
 	if s.ore < 0 || s.obsidian < 0 {
@@ -130,7 +161,27 @@ func (b BuyGeode) doAction(s State, bp Blueprint) State {
 	return s
 }
 
-func collect(s State) State {
+//Helper functions to determine whether it's possible to perform the purchase.
+
+func canBuyOre(s EconomyState, bp Blueprint) bool {
+	return s.ore >= bp.oreCost
+}
+
+func canBuyClay(s EconomyState, bp Blueprint) bool {
+	return s.ore >= bp.clayCost
+}
+
+func canBuyObsidian(s EconomyState, bp Blueprint) bool {
+	return s.ore >= bp.obsidianCost[0] && s.clay >= bp.obsidianCost[1]
+}
+
+func canBuyGeode(s EconomyState, bp Blueprint) bool {
+	return s.ore >= bp.geodeCost[0] && s.obsidian >= bp.geodeCost[1]
+}
+
+// collect is called during every state, to simulate robots collecting
+// resources.
+func collect(s EconomyState) EconomyState {
 	s.ore += s.oreRobots
 	s.clay += s.clayRobots
 	s.obsidian += s.obsidianRobots
@@ -138,32 +189,16 @@ func collect(s State) State {
 	return s
 }
 
-func canBuyOre(s State, bp Blueprint) bool {
-	return s.ore >= bp.oreCost
-}
-
-func canBuyClay(s State, bp Blueprint) bool {
-	return s.ore >= bp.clayCost
-}
-
-func canBuyObsidian(s State, bp Blueprint) bool {
-	return s.ore >= bp.obsidianCost[0] && s.clay >= bp.obsidianCost[1]
-}
-
-func canBuyGeode(s State, bp Blueprint) bool {
-	return s.ore >= bp.geodeCost[0] && s.obsidian >= bp.geodeCost[1]
-}
-
-type Stats struct {
-	state  State
+// State stores all the relevant information that is required during an
+// exploration state.
+type State struct {
+	state  EconomyState
 	action Action
 }
 
 // maxTheoreticalGeode returns the maximum theoretical geodes one can collect
 // from this state, including the geodes they already have.
-func maxTheoreticalGeode(s State, bp Blueprint, rounds int) int {
-
-	//fmt.Println(bp)
+func maxTheoreticalGeode(s EconomyState, bp Blueprint, rounds int) int {
 
 	/* Note that state is passed by copy, so it's fine to modify it. */
 
@@ -212,8 +247,6 @@ func maxTheoreticalGeode(s State, bp Blueprint, rounds int) int {
 		}
 	}
 
-	//fmt.Println("obsidian robot at minute", s.minute)
-
 	// Exact same as for obsidian.
 	if s.geodeRobots == 0 {
 		for s.obsidian < bp.geodeCost[1] {
@@ -230,8 +263,6 @@ func maxTheoreticalGeode(s State, bp Blueprint, rounds int) int {
 			return s.geode
 		}
 	}
-	//fmt.Println("geode robot at minute", s.minute)
-
 	// Keep collecting geode
 	for s.minute < rounds+1 {
 		s.geode += s.geodeRobots
@@ -242,154 +273,7 @@ func maxTheoreticalGeode(s State, bp Blueprint, rounds int) int {
 	return s.geode
 }
 
-// determineQualityLevel determines the quality level of a single blueprint.
-func determineQualityLevel(bp Blueprint) int {
-	initialState := State{
-		minute:         0,
-		oreRobots:      1,
-		ore:            0,
-		clayRobots:     0,
-		clay:           0,
-		obsidianRobots: 0,
-		obsidian:       0,
-		geodeRobots:    0,
-		geode:          0,
-	}
-
-	initialStats := Stats{
-		state:  initialState,
-		action: VoidAction{},
-	}
-
-	q := make([]Stats, 0)
-	hashes := make(map[Stats]struct{})
-
-	q = append(q, initialStats)
-	hashes[initialStats] = struct{}{}
-
-	maxGeode := 0
-
-	for len(q) > 0 {
-		current := q[0]
-		q = q[1:]
-
-		delete(hashes, current)
-
-		// Increase the minute before the collection.
-		current.state.minute++
-		fmt.Println(current.state)
-
-		// Explored all 23-minute states
-		if current.state.minute == 24 {
-			return maxGeode
-		}
-
-		// Collect the resources at the beginning of each minute.
-		current.state = collect(current.state)
-
-		if current.state.minute == 23 {
-			switch current.action.(type) {
-			// If this round a geode robot is build, we will have one
-			// additional geode at the end of minute 24.
-			case BuyGeode:
-				if current.state.geode+current.state.geodeRobots+1 > maxGeode {
-					maxGeode = current.state.geode + current.state.geodeRobots + 1
-				}
-				// Otherwise, we
-			default:
-				if current.state.geode+current.state.geodeRobots > maxGeode {
-					maxGeode = current.state.geode + current.state.geodeRobots
-				}
-			}
-		}
-
-		// Execute the action.
-
-		//fmt.Printf("initial: %+v\n", current.state)
-		current.state = current.action.doAction(current.state, bp)
-		//fmt.Printf("after: %+v\n", current.state)
-
-		dontBuyOre := false
-		dontBuyClay := false
-		dontBuyObsidian := false
-		doSomething := false
-
-		// Have the ore for a clay, obsidian and geode at every round. In this
-		// case you should never buy ore robots anymore.
-		if current.state.oreRobots >= max([]int{bp.clayCost, bp.obsidianCost[0], bp.geodeCost[0]}) {
-			dontBuyOre = true
-		}
-
-		// Have the clay for an obsidian robot at any round, there's no need to
-		// buy clay anymore.
-		if current.state.clayRobots >= bp.obsidianCost[1] {
-			dontBuyClay = true
-		}
-
-		// Same as clay for obsidian. In this case, only buy geode robots from
-		// now on.
-		if current.state.obsidianRobots >= bp.geodeCost[1] {
-			act := BuyGeode{}
-			q = append(q, Stats{
-				state:  current.state,
-				action: act,
-			})
-			continue
-		}
-
-		// If I can buy any of the robots, it's completely pointless to wait
-		// further.
-		if canBuyClay(current.state, bp) &&
-			canBuyOre(current.state, bp) &&
-			canBuyGeode(current.state, bp) &&
-			canBuyObsidian(current.state, bp) {
-			doSomething = true
-		}
-
-		acts := []Action{}
-
-		// We're only interested in buying robots if we can buy them next round
-		// and it actually makes sense to buy more.
-
-		if !dontBuyOre && canBuyOre(current.state, bp) {
-			acts = append(acts, BuyOre{})
-			//fmt.Println("adding ore action")
-		}
-		if !dontBuyClay && canBuyClay(current.state, bp) {
-			acts = append(acts, BuyClay{})
-			//fmt.Println("adding clay action")
-
-		}
-		if !dontBuyObsidian && canBuyObsidian(current.state, bp) {
-			acts = append(acts, BuyObsidian{})
-			//fmt.Println("adding obs action")
-
-		}
-		if canBuyGeode(current.state, bp) {
-			acts = append(acts, BuyGeode{})
-			//fmt.Println("adding geode action")
-
-		}
-		if !doSomething {
-			acts = append(acts, VoidAction{})
-		}
-		//fmt.Println("acts", len(acts))
-		for _, act := range acts {
-			stat := Stats{
-				state:  current.state,
-				action: act,
-			}
-			if _, ok := hashes[stat]; !ok {
-				q = append(q, stat)
-				hashes[stat] = struct{}{}
-			}
-		}
-
-	}
-	return maxGeode
-}
-
-func dfs(current Stats, bp Blueprint, maxGeode *int, hashes map[Stats]struct{}, rounds int) {
+func dfs(current State, bp Blueprint, maxGeode *int, hashes map[State]struct{}, rounds int) {
 
 	// Remove the current state from the hash map.
 	//delete(hashes, current)
@@ -452,7 +336,7 @@ func dfs(current Stats, bp Blueprint, maxGeode *int, hashes map[Stats]struct{}, 
 	// now on.
 	if current.state.obsidianRobots >= bp.geodeCost[1] && current.state.oreRobots >= bp.geodeCost[0] {
 		act := BuyGeode{}
-		stat := Stats{
+		stat := State{
 			state:  current.state,
 			action: act,
 		}
@@ -499,7 +383,7 @@ func dfs(current Stats, bp Blueprint, maxGeode *int, hashes map[Stats]struct{}, 
 	}
 	//fmt.Println("acts", len(acts))
 	for _, act := range acts {
-		stat := Stats{
+		stat := State{
 			state:  current.state,
 			action: act,
 		}
@@ -528,45 +412,61 @@ func main() {
 		blueprints = append(blueprints, bp)
 	}
 
-	initialState := State{
-		minute:         0,
-		oreRobots:      1,
-		ore:            0,
-		clayRobots:     0,
-		clay:           0,
-		obsidianRobots: 0,
-		obsidian:       0,
-		geodeRobots:    0,
-		geode:          0,
+	initialState := EconomyState{
+		minute: 0,
+		ResourceCount: ResourceCount{
+			ore:      0,
+			clay:     0,
+			obsidian: 0,
+			geode:    0,
+		},
+		RobotCount: RobotCount{
+			oreRobots:      1,
+			clayRobots:     0,
+			obsidianRobots: 0,
+			geodeRobots:    0,
+		},
 	}
 
-	initialStats := Stats{
+	initialStats := State{
 		state:  initialState,
 		action: VoidAction{},
 	}
 
 	part := 2
 	if part == 1 {
+		t := time.Now()
 		quality := 0
 		for _, bp := range blueprints {
 			maxGeode := 0
-			hashStates := make(map[Stats]struct{})
+			hashStates := make(map[State]struct{})
 			hashStates[initialStats] = struct{}{}
 			dfs(initialStats, bp, &maxGeode, hashStates, 24)
 			quality += maxGeode * bp.ID
 		}
+		fmt.Println(time.Since(t))
 
 		fmt.Printf("Quality level: %d", quality)
 	} else {
+		t := time.Now()
 		qualities := [3]int{}
+		values := make(chan int, 3)
 		for i := 0; i < 3; i++ {
-			maxGeode := 0
-			hashStates := make(map[Stats]struct{})
-			hashStates[initialStats] = struct{}{}
-			dfs(initialStats, blueprints[i], &maxGeode, hashStates, 32)
-			qualities[i] = maxGeode
+			go func(i int) {
+				maxGeode := 0
+				hashStates := make(map[State]struct{})
+				hashStates[initialStats] = struct{}{}
+				dfs(initialStats, blueprints[i], &maxGeode, hashStates, 32)
+				values <- maxGeode
+			}(i)
 		}
-		fmt.Println(qualities)
+		for i := 0; i < 3; i++ {
+			qualities[i] = <-values
+		}
+		fmt.Println(time.Since(t))
+		fmt.Printf("Qualities multiply to %d", func(nums [3]int) int {
+			return nums[0] * nums[1] * nums[2]
+		}(qualities))
 	}
 
 }

@@ -16,20 +16,23 @@ func Add(d1 Location, d2 Direction) Location {
 }
 
 var (
+	// Origin represents the center of the plane, or (0,0).
 	ORIGIN Location = Location{0, 0}
 )
 
 var (
 	// Moves one unit to the left of the x-axis.
-	LEFT Direction = Direction{-1, 0}
+	LEFT Direction = Direction{0, -1}
 	// Moves one unit to the right of the x-axis.
-	RIGHT Direction = Direction{0, -1}
+	RIGHT Direction = Direction{0, 1}
 	// Moves one unit upwards the y-axis. Likely for parsing reasons, in all
 	// Advent-of-Code problems the y-axis is reversed.
 	UP Direction = Direction{-1, 0}
 	// Moves one unit downwards the y-axis. Likely for parsing reasons, in all
 	// Advent-of-Code problems the y-axis is reversed.
 	DOWN Direction = Direction{1, 0}
+	// Doesn't move.
+	NULL Direction = Direction{0, 0}
 )
 
 /* Directions, expressed as cardinal directions. */

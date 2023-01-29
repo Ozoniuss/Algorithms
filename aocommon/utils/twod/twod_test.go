@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAdd(t *testing.T) {
+func TestMove(t *testing.T) {
 	assert := assert.New(t)
 	type test struct {
 		loc      Location
@@ -31,6 +31,6 @@ func TestAdd(t *testing.T) {
 		})
 	}
 	for _, t := range tests {
-		assert.Equal(t.expected, Add(t.loc, t.dir))
+		assert.Equal(t.expected, Move(t.loc, t.dir))
 	}
 }

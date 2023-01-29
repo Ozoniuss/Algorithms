@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Ozoniuss/Algorithms/aocommon/utils/twod"
+	"github.com/Ozoniuss/go-aoc/twod"
 )
 
 // dirFromString takes a string representing a direction as input, and returns

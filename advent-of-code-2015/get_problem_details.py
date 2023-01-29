@@ -1,5 +1,6 @@
 import sys
 import re
+import html
 
 def title_to_dir(title: str):
     """ 
@@ -15,6 +16,15 @@ def title_to_dir(title: str):
 
     if len(day) == 1:
         day = "0"+day
+    
+    # Unescape the name to avoid having characters written as e.g. &aops;
+    # instead of '
+    name = html.unescape(name)
+    
+    # Remove reserved characters to be able to create directory.
+    RESERVED = ['<', '>', ':', '\"', "/", "\\", "|", "?", "*"]
+    for r in RESERVED:
+        name = name.replace(r, "")
     
     # Get the names as lowercase
     name_words = [n.lower() for n in name.split(" ")]

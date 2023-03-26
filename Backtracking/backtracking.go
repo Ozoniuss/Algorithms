@@ -73,13 +73,116 @@ func cartezianProductRecursive(sets [][]int) [][]int {
 	return product
 }
 
+func bfs(nums []int) {
+	q := [][]int{}
+	for _, n := range nums {
+		q = append(q, []int{n})
+	}
+
+	for len(q) > 0 {
+		curr := q[0]
+		fmt.Println(curr)
+		q = q[1:]
+		for _, num := range nums {
+
+			currCopy := make([]int, len(curr))
+			copy(currCopy, curr)
+			currCopy = append(currCopy, num)
+			if len(currCopy) <= 3 {
+				q = append(q, currCopy)
+			}
+		}
+	}
+}
+
+func dfsrec(nums []int, curr []int) {
+
+	if len(curr) == 4 {
+		return
+	}
+
+	fmt.Println(curr)
+	for _, num := range nums {
+		currCopy := make([]int, len(curr))
+		copy(currCopy, curr)
+		currCopy = append(currCopy, num)
+		dfsrec(nums, currCopy)
+
+	}
+}
+
+func bfsrec(nums []int, q [][]int) {
+
+	if len(q[0]) == 4 {
+		return
+	}
+
+	curr := q[0]
+	fmt.Println(curr)
+	q = q[1:]
+	for _, num := range nums {
+		currCopy := make([]int, len(curr))
+		copy(currCopy, curr)
+		currCopy = append(currCopy, num)
+		q = append(q, currCopy)
+	}
+	bfsrec(nums, q)
+}
+
+func dfs(nums []int) {
+	s := [][]int{}
+	for _, n := range nums {
+		s = append(s, []int{n})
+	}
+
+	for len(s) > 0 {
+		curr := s[0]
+		fmt.Println(curr)
+		s = s[1:]
+		for i := len(nums) - 1; i >= 0; i-- {
+			currCopy := make([]int, len(curr))
+			copy(currCopy, curr)
+
+			currCopy = append(currCopy, nums[i])
+
+			if len(currCopy) <= 3 {
+
+				c := [][]int{currCopy}
+				s = append(c, s...)
+			}
+		}
+	}
+}
+
+func update(n *[]int) {
+	*n = append(*n, 6)
+	*n = append(*n, 7)
+	(*n)[1] = 4
+}
+
+func updateMap(m map[int]int) {
+	m[2] = 4
+}
+
+func updateQ(q []int) {
+	q = make([]int, 3)
+}
+
 func main() {
 	// _ = cartezianProductIterativeOptimized([][]int{{1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}})
 
-	prods := cartezianProductRecursive([][]int{{1, 2, 3}, {1, 2, 3}, {1, 2, 3}})
-	fmt.Println(prods)
-	for _, p := range prods {
-		fmt.Println(p)
-	}
+	// prods := cartezianProductRecursive([][]int{{1, 2, 3}, {1, 2, 3}, {1, 2, 3}})
+	// fmt.Println(prods)
+	// for _, p := range prods {
+	// 	fmt.Println(p)
+	// }
+
+	//dfsrec([]int{1, 2, 3}, []int{})
+	dfs([]int{1, 2, 3})
+
+	// q := []int{1, 2, 3, 4, 5}
+	// fmt.Println(q)
+	// updateQ(q)
+	// fmt.Println(q)
 
 }

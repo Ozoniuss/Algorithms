@@ -281,6 +281,7 @@ func main() {
 	borders[1][0] = row
 	start, end := startAndEndLocations(borders)
 
+	// Runs in about 5 minutes.
 	exitsAfter1, blizzards1 := bfs(start, end, blizzards, borders)
 	exitsAfter2, blizzards2 := bfs(end, start, blizzards1, borders)
 	exitsAfter3, _ := bfs(start, end, blizzards2, borders)

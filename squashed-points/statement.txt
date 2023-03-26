@@ -1,0 +1,6 @@
+Consider n lattice points in a 2D plane. You are required to compute the square (function) of minimum distance between any two of the first two points, then the first three points, and so on until the nth point.
+
+1 <= n <= 1e5
+- 1<<31 <= x, y <= 1<<31 (int)
+
+Flaviu Craciun

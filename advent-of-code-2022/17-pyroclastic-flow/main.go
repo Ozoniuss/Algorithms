@@ -279,8 +279,8 @@ func dropAll(turns int, directons []Direction) (map[[2]int]struct{}, int) {
 
 	downbound := DOWN_BOUND
 
-	hashesMap := make(map[PieceHash]int, 0)
-	hashesArray := []PieceHash{}
+	//hashesMap := make(map[PieceHash]int, 0)
+	//hashesArray := []PieceHash{}
 	computeDuplicate := true
 	duplicates := []PieceHash{}
 
@@ -290,23 +290,26 @@ func dropAll(turns int, directons []Direction) (map[[2]int]struct{}, int) {
 
 	for computeDuplicate {
 
-		hash := dropPiece(turn, &height, &currentDir, directons, &board, &downbound)
+		dropPiece(turn, &height, &currentDir, directons, &board, &downbound)
+		if turn%1000 == 0 {
+			fmt.Println(turn)
+		}
 		//fmt.Println(hash)
 		// If the hash already exists
-		if _, ok := hashesMap[hash]; ok {
-			fmt.Println(turn, "duplicate hash found", hash, hashesMap[hash])
-			computeDuplicate = false
-			heightUntilDuplicates = height - hash.addedHeight
-			for x := hashesMap[hash]; x < turn; x++ {
-				duplicates = append(duplicates, hashesArray[x])
-			}
+		// if _, ok := hashesMap[hash]; ok {
+		// 	fmt.Println(turn, "duplicate hash found", hash, hashesMap[hash])
+		// 	computeDuplicate = false
+		// 	heightUntilDuplicates = height - hash.addedHeight
+		// 	for x := hashesMap[hash]; x < turn; x++ {
+		// 		duplicates = append(duplicates, hashesArray[x])
+		// 	}
 
-			// If the hash doesn't exist, just add it.
-		} else {
-			hashesMap[hash] = turn
-			hashesArray = append(hashesArray, hash)
-			//fmt.Println(hash)
-		}
+		// 	// If the hash doesn't exist, just add it.
+		// } else {
+		// 	hashesMap[hash] = turn
+		// 	hashesArray = append(hashesArray, hash)
+		// 	//fmt.Println(hash)
+		// }
 		turn++
 	}
 
@@ -316,6 +319,7 @@ func dropAll(turns int, directons []Direction) (map[[2]int]struct{}, int) {
 
 	heightDuplicatesAdd := 0
 	duplicatesLength := len(duplicates)
+	fmt.Println(duplicatesLength)
 	for _, d := range duplicates {
 		heightDuplicatesAdd += d.addedHeight
 	}
@@ -373,8 +377,8 @@ func main() {
 	pattern := scanner.Text()
 	directions := dirsFromPattern(pattern)
 
-	//_, h := dropAll(2022, directions)
-	_, h := dropAll(1000000000000, directions)
+	_, h := dropAll(2022, directions)
+	// _, h := dropAll(1000000000000, directions)
 	fmt.Printf("The maximum height of the tower is %d\n", h)
 
 	//drawBoard(&b, h)

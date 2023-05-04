@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // singleNumber returns the number that appears only once in the array.
 func singleNumberInt32(nums []int) int {
 	var repeated = make(map[int32]struct{})
@@ -37,10 +39,19 @@ func singleNumber(nums []int) int {
 	return 0
 }
 
+func singleNumberXOR(nums []int) int {
+	repeated := 0
+	for _, num := range nums {
+		repeated = repeated ^ num
+	}
+	return repeated
+}
+
 var out = 0
 
 func main() {
-	out = singleNumberInt32(allnums)
+	out = singleNumberXOR(allnums)
+	fmt.Println(out)
 }
 
 var allnums = []int{

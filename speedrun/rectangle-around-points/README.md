@@ -9,12 +9,13 @@ It doesn't matter how the points are stored (list, map) or how they are populate
 Input:
 
 ```
-[0,2]; [1,3]; [2,0]; [2,3]; [2,5]; [3,2]; [3,4]; [6,2]; [6,4]; [8,5]; [9,3]; 
-[9,4]
+[0,2]; [1,3]; [2,0]; [2,3]; [2,5]; [3,2]; [3,4]; [6,2]; [6,4]; [8,5]; [9,3]; [9,4]
+```
 
 The rectangle that contains these points looks like this (the point at the lower
 left cornet is at the origin (0,0)):
 
+```
 . . x . . . . . x .
 . . . x . . x . . x
 . x x . . . . . . x

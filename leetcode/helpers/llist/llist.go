@@ -99,6 +99,8 @@ func Equal(l1, l2 *ListNode) bool {
 	return cur2 == nil
 }
 
+// String converts a linked list to its string representation. It assumes that
+// there are no cycles.
 func (l *ListNode) String() string {
 	if l == nil {
 		return "nil"

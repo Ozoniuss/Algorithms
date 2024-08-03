@@ -9,3 +9,4 @@ test_stuff.go
 *.exe
 *.class
 
+.venv

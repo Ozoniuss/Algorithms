@@ -55,7 +55,53 @@ func spiralOrder(matrix [][]int) []int {
 	return out
 }
 
+func spiralOrderOptimizedForSpace(matrix [][]int) []int {
+
+	L := len(matrix)
+	C := len(matrix[0])
+
+	currL := L - 1
+	currC := C
+
+	dir := RIGHT
+	cloc := loc{0, 0}
+	out := []int{}
+
+	stepsMade := 0
+	orientation := 1
+	for {
+		fmt.Println(cloc, currC, currL)
+		out = append(out, matrix[cloc[0]][cloc[1]])
+		stepsMade += 1
+
+		nloc := loc{cloc[0] + dir[0], cloc[1] + dir[1]}
+		if orientation == 0 && stepsMade == currL {
+			if currC == 0 {
+				return out
+			}
+			orientation = (orientation + 1) % 2
+			currL -= 1
+			dir = nextdir(dir)
+			cloc = loc{cloc[0] + dir[0], cloc[1] + dir[1]}
+			stepsMade = 0
+			continue
+		}
+		if orientation == 1 && stepsMade == currC {
+			if currL == 0 {
+				return out
+			}
+			orientation = (orientation + 1) % 2
+			currC -= 1
+			dir = nextdir(dir)
+			cloc = loc{cloc[0] + dir[0], cloc[1] + dir[1]}
+			stepsMade = 0
+			continue
+		}
+		cloc = nloc
+	}
+}
+
 func main() {
 	m := [][]int{[]int{1, 2, 3, 4}, []int{5, 6, 7, 8}, []int{9, 10, 11, 12}}
-	fmt.Println(spiralOrder(m))
+	fmt.Println(spiralOrderOptimizedForSpace(m))
 }

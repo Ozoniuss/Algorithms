@@ -101,7 +101,51 @@ func spiralOrderOptimizedForSpace(matrix [][]int) []int {
 	}
 }
 
+func spiralOrderWIthBoundaries(matrix [][]int) []int {
+
+	L := len(matrix)
+	C := len(matrix[0])
+	boundaries := [4]int{0, L, 0, C}
+
+	out := []int{}
+
+	for {
+		for j := boundaries[2]; j < boundaries[3]; j++ {
+			i := boundaries[0]
+			out = append(out, matrix[i][j])
+		}
+		boundaries[0] += 1
+		if boundaries[0] == boundaries[1] {
+			return out
+		}
+		for i := boundaries[0]; i < boundaries[1]; i++ {
+			j := boundaries[3] - 1
+			out = append(out, matrix[i][j])
+		}
+		boundaries[3] -= 1
+		if boundaries[2] == boundaries[3] {
+			return out
+		}
+		for j := boundaries[3] - 1; j >= boundaries[2]; j-- {
+			i := boundaries[1] - 1
+			out = append(out, matrix[i][j])
+		}
+		boundaries[1] -= 1
+		if boundaries[0] == boundaries[1] {
+			return out
+		}
+		for i := boundaries[1] - 1; i >= boundaries[0]; i-- {
+			j := boundaries[2]
+			out = append(out, matrix[i][j])
+		}
+		boundaries[2] += 1
+		if boundaries[2] == boundaries[3] {
+			return out
+		}
+	}
+}
+
 func main() {
 	m := [][]int{[]int{1, 2, 3, 4}, []int{5, 6, 7, 8}, []int{9, 10, 11, 12}}
-	fmt.Println(spiralOrderOptimizedForSpace(m))
+	fmt.Println(spiralOrderWIthBoundaries(m))
 }

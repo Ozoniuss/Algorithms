@@ -1,7 +1,53 @@
-from collections import Counter
+from collections import Counter, defaultdict
+import math
 
 class Solution:
+
+
     def minWindow(self, s: str, t: str) -> str:
+
+        if len(t) == 0:
+            return ""
+
+        if len(t) == 1:
+            if t in s:
+                return t
+            else:
+                return ""
+            
+        origs = s
+        cnt = dict(Counter(t))
+        needchars = len(cnt)
+
+        s = list((idx, c) for idx, c in enumerate(s) if c in cnt)
+        actualctt = defaultdict(int)
+        gotchars = 0
+
+        l, r = 0,0
+        minstr, minstrlen = "", math.inf
+        while r < len(s):
+            rpos, rchar = s[r][0], s[r][1]
+            actualctt[rchar] += 1
+            if actualctt[rchar] == cnt[rchar]:
+                gotchars += 1
+            if gotchars >= needchars:
+                while l <= r:
+                    lpos, lchar = s[l][0], s[l][1]
+                    if actualctt[lchar] - 1 >= cnt[lchar]:
+                        actualctt[lchar] -= 1
+                        l += 1
+                    else:
+                        if (rpos-lpos + 1) < minstrlen:
+                            minstrlen = (rpos-lpos+1)
+                            minstr = origs[lpos:rpos+1]
+                        break
+            r += 1
+        return minstr
+
+
+
+
+    def minWindowv2(self, s: str, t: str) -> str:
 
         if len(t) == 0:
             return ""
@@ -37,7 +83,6 @@ class Solution:
         # for c
 
     def getShortestSol(self,lastocc: dict, cnt: dict, cchar):
-        (lastocc, cnt, cchar)
         if cchar not in lastocc:
             return None
         
@@ -65,3 +110,6 @@ class Solution:
 
 s = Solution()
 print(s.minWindow("sdadsadhsladjlasd", "sadd"))
+print(s.minWindow("ababab", "aaabbb"))
+print(s.minWindow("abab", "aaabbb"))
+print(s.minWindow("ADOBECODEBANC", "ABC"))

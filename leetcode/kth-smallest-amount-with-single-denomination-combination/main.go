@@ -5,22 +5,38 @@ import (
 )
 
 func main() {
-	nums := []int{12, 18, 24, 36, 60}
+	fmt.Println(findKthSmallest([]int{3, 6, 9}, 3))
+	fmt.Println(findKthSmallest([]int{2, 5}, 7))
+	fmt.Println(findKthSmallest([]int{1, 4}, 5))
 
-	fmt.Println("GCD:", gcdList(nums)) // 6
-	fmt.Println("LCM:", lcmList(nums)) // 72
-
-	fmt.Println(generateSubset(nums, 0, 2))
-
-	nums = []int{2, 5}
-	fmt.Println(findKthSmallest(nums, 3))
 }
 
-func findKthSmallest(coins []int, k int) int {
+func findKthSmallest(coins []int, k int) int64 {
+	subsets := make([][][]int, len(coins)+1)
+	for i := 1; i < len(coins)+1; i++ {
+		subsets[i] = generateSubset(coins, 0, i)
+	}
+
+	step := 1 << 32
+	current := 0
+
+	for step > 0 {
+		// we will stop increasing current at exactly the point when the number
+		// of combinations with the coins we can make that are strictly smaller
+		// than it becomes k (since last step is 1).
+		for coinConbinationsLessThanK(coins, current+step, subsets) < k {
+			current += step
+		}
+		step = step / 2
+	}
+	return int64(current)
+}
+
+func coinConbinationsLessThanK(coins []int, k int, subsets [][][]int) int {
 	beforek := 0
 	for i := 1; i < len(coins)+1; i++ {
-		subsets := generateSubset(coins, 0, i)
-		for _, s := range subsets {
+		subsetlist := subsets[i]
+		for _, s := range subsetlist {
 			lc := lcmList(s)
 			diff := k / lc
 			if k%lc == 0 {

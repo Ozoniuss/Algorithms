@@ -26,10 +26,14 @@ import "fmt"
 // I would have ever come up with something like this.
 
 func largestOverlap(img1 [][]int, img2 [][]int) int {
+	n := len(img1)
 	i1 := [][2]int{}
 	i2 := [][2]int{}
 
-	cnt := map[[2]int]int{}
+	cnt := make([][]int, n)
+	for i := range n {
+		cnt[i] = make([]int, n)
+	}
 
 	for i := range len(img1) {
 		for j := range len(img1[0]) {
@@ -47,16 +51,14 @@ func largestOverlap(img1 [][]int, img2 [][]int) int {
 		}
 	}
 
+	m := 0
 	for _, x := range i1 {
 		for _, y := range i2 {
-			cnt[[2]int{y[0] - x[0], y[1] - x[1]}] += 1
-		}
-	}
+			dx := y[0] - x[0] + n
+			dy := y[0] - x[0] + n
+			cnt[dx][dy] += 1
 
-	m := 0
-	for _, v := range cnt {
-		if v > m {
-			m = v
+			m = max(m, cnt[dx][dy])
 		}
 	}
 

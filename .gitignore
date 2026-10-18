@@ -8,5 +8,9 @@ test_stuff.go
 
 *.exe
 *.class
+*.pdf
+*.zip
 
 .venv
+
+__pycache__/
